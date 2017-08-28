@@ -59,32 +59,42 @@ TheoryScale {
 		var ub = 10000, lb = 0;
 		var min = midi_to_degree.minItem;
 		var max = midi_to_degree.maxItem;
+		var linlower, linupper;
 		while ({midi >= steps_per_octave }, { midi = midi - steps_per_octave});
 		// handle degrees for notes inside scale
 		if (midi_to_degree.keys.includes(midi), { ^midi_to_degree[midi]; });
-		// handle degrees for notes outside scale
+		// handle degrees for notes outside scale: linearly interpolate between closest degrees in scale
 		midi_to_degree.keys.do({
 			| m |
 			if (((m > lb) && (m < midi)), { lb = m; });
 			if (((m < ub) && (m > midi)), { ub = m; });
 		});
-		^midi.linlin(lb,ub,midi_to_degree[lb],midi_to_degree[ub]);
+		linupper = midi_to_degree[ub];
+		linlower = midi_to_degree[lb];
+		if ((linlower.isNil), { ^midi; });
+		if ((linupper < linlower),{linupper = linlower + 1;});
+		^midi.linlin(lb,ub,linlower,linupper);
 	}
 
 	degreeToMidi {
 		| degree, octave |
 		var degree_to_midi = midi_to_degree.invert;
 		var extra_octaves = 0, ub = 10000, lb = 0;
+		var result;
 		while ({degree > degree_to_midi.keys.maxItem},{ degree = degree - degree_to_midi.keys.maxItem; extra_octaves = extra_octaves+1; });
 		while ({degree < degree_to_midi.keys.minItem},{ degree = degree + degree_to_midi.keys.minItem; extra_octaves = extra_octaves-1; });
 		// handle midi for notes inside scale
-		if (degree_to_midi.keys.includes(degree), { ^(degree_to_midi[degree] + ((octave+extra_octaves+1)*steps_per_octave))});
+		if (degree_to_midi.keys.includes(degree), {
+			var result = (degree_to_midi[degree] + ((octave+extra_octaves+1)*steps_per_octave));
+			if ((result < parser.asMidi(referencenote)[0]), { ^(result + steps_per_octave); }, { ^result; });
+		});
 		// handle midi for notes outside scale
 		degree_to_midi.keys.do({
 			| d |
 			if (((d > lb) && (d < degree)), { lb = d; });
 			if (((d < ub) && (d > degree)), { ub = d; });
 		});
-		^degree.linlin(lb,ub,degree_to_midi[lb] + ((octave+extra_octaves+1)*steps_per_octave),degree_to_midi[ub] + ((octave+extra_octaves+1)*steps_per_octave));
+		result = degree.linlin(lb,ub,degree_to_midi[lb] + ((octave+extra_octaves+1)*steps_per_octave),degree_to_midi[ub] + ((octave+extra_octaves+1)*steps_per_octave));
+		if ((result < parser.asMidi(referencenote)[0]), { ^(result + steps_per_octave); }, { ^result; });
 	}
 }

@@ -40,12 +40,15 @@ TestTheoryScale : UnitTest {
 
 	test_midiToDegree {
 		var u;
-		u = TheoryScale.new("e4", "major", "e4 f#4 g#4 a4 b4 c#4 d#4");
+		u = TheoryScale.new("e4", "major", "e4 f#4 g#4 a4 b4 c#5 d#5");
 		this.assert(u.midiToDegree(69) == 3, "Note in scale");
 		this.assert(u.midiToDegree(70) == 3.5, "Note outside scale");
-		this.assert(u.midiToDegree(69) == 3, "Note in scale 2");
 		this.assert(u.midiToDegree(68.5) == 2.5, "Note outside scale 2");
 		this.assert(u.midiToDegree(68) == 2, "Note outside scale 3");
+		this.assert(u.midiToDegree(75) == 6, "Note at extreme of scale");
+		this.assert(u.midiToDegree(75.5) == 6.5, "Note outside extreme of scale");
+		u.midiToDegree(0.5);
+		this.assert(u.midiToDegree(0.5) == 0.5, "Note outside extreme of scale 2");
 	}
 
 	test_degreeToMidi {
@@ -57,10 +60,8 @@ TestTheoryScale : UnitTest {
 		this.assert(u.degreeToMidi(5.5, 4) == 70, "Degree outside scale");
 		this.assert(u.degreeToMidi(11.5, 4) == (69+12+1), "Degree outside scale outside octave");
 
-		v.degreeToMidi(0, 4).postln;
-		v.degreeToMidi(1, 4).postln;
-		this.assert(v.degreeToMidi(0, 4) == 83, "Degree in scale");
-		this.assert(v.degreeToMidi(1, 4) == 85, "Degree in scale, crossing octave boundary");
+		this.assert(v.degreeToMidi(0, 4) == 71, "Degree in scale");
+		this.assert(v.degreeToMidi(1, 4) == 73, "Degree in scale, crossing octave boundary");
 	}
 }
 
