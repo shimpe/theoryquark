@@ -1,7 +1,7 @@
 TheoryScale {
 	var <>referencenote;
 	var <>name;
-    var <>notes;
+	var <>notes;
 	var <>midi_to_degree;
 
 	classvar >parser;
