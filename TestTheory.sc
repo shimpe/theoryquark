@@ -78,5 +78,3 @@ TestTheoryScale : UnitTest {
 		});
 	}
 }
-
-
