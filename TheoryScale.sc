@@ -21,15 +21,16 @@ TheoryScale {
 	init {
 		| basenote, type, collection |
 		var m;
+		var reduction;
 		referencenote = basenote;
 		name = type;
 		notes = collection;
 		midi_to_degree = Dictionary.new;
 		m = this.asMidi.value;
+		reduction = ((m.minItem).div(12))*12;
 		m.do({
 			| midi, idx |
-			while ({midi >= steps_per_octave }, { midi = midi-steps_per_octave});
-			midi_to_degree[midi] = idx;
+			midi_to_degree[midi - reduction ] = idx;
 		});
 	}
 
@@ -45,7 +46,7 @@ TheoryScale {
 	}
 
 	asDegree {
-		^midi_to_degree;
+		^midi_to_degree.collect({ | el, i | el[i] });
 	}
 
 	noteToDegree {
@@ -56,45 +57,41 @@ TheoryScale {
 
 	midiToDegree {
 		| midi |
-		var ub = 10000, lb = 0;
-		var min = midi_to_degree.minItem;
-		var max = midi_to_degree.maxItem;
-		var linlower, linupper;
-		while ({midi >= steps_per_octave }, { midi = midi - steps_per_octave});
-		// handle degrees for notes inside scale
-		if (midi_to_degree.keys.includes(midi), { ^midi_to_degree[midi]; });
-		// handle degrees for notes outside scale: linearly interpolate between closest degrees in scale
-		midi_to_degree.keys.do({
-			| m |
-			if (((m > lb) && (m < midi)), { lb = m; });
-			if (((m < ub) && (m > midi)), { ub = m; });
+		var reduced_midi = midi.mod(steps_per_octave);
+		var min_midi = midi_to_degree.keys().minItem;
+		var max_midi = midi_to_degree.keys().maxItem;
+		while ({reduced_midi < min_midi}, { reduced_midi = reduced_midi + steps_per_octave; });
+		if ((reduced_midi < max_midi), {
+			var ub = 10000;
+			var lb = 0;
+			midi_to_degree.keys.do({
+				| midi |
+				if (((midi > lb) && (midi <= reduced_midi)), { lb = midi; });
+				if (((midi < ub) && (midi >= reduced_midi)), { ub = midi; });
+			});
+			^reduced_midi.linlin(lb, ub, midi_to_degree[lb], midi_to_degree[ub]);
+		}, {
+			var next_midi = min_midi + steps_per_octave;
+			var next_degree = midi_to_degree[max_midi] + 1;
+			^reduced_midi.linlin(max_midi, next_midi, midi_to_degree[max_midi], next_degree);
 		});
-		linupper = midi_to_degree[ub];
-		linlower = midi_to_degree[lb];
-		if ((linlower.isNil), { ^midi; });
-		if ((linupper < linlower),{linupper = linlower + 1;});
-		^midi.linlin(lb,ub,linlower,linupper);
 	}
 
 	degreeToMidi {
 		| degree, octave |
 		var degree_to_midi = midi_to_degree.invert;
-		var extra_octaves = 0, ub = 10000, lb = 0;
-		var result;
-		while ({degree > degree_to_midi.keys.maxItem},{ degree = degree - degree_to_midi.keys.maxItem; extra_octaves = extra_octaves+1; });
-		while ({degree < degree_to_midi.keys.minItem},{ degree = degree + degree_to_midi.keys.minItem; extra_octaves = extra_octaves-1; });
-		// handle midi for notes inside scale
-		if (degree_to_midi.keys.includes(degree), {
-			var result = (degree_to_midi[degree] + ((octave+extra_octaves+1)*steps_per_octave));
-			if ((result < parser.asMidi(referencenote)[0]), { ^(result + steps_per_octave); }, { ^result; });
-		});
-		// handle midi for notes outside scale
+		var min_degree = 0;
+		var max_degree = degree_to_midi.keys.maxItem;
+		var no_of_degrees = degree_to_midi.size;
+		var reduced_degree = degree.mod(no_of_degrees);
+		var extra_octaves = degree.div(no_of_degrees);
+		var ub = 10000;
+		var lb = 0;
 		degree_to_midi.keys.do({
-			| d |
-			if (((d > lb) && (d < degree)), { lb = d; });
-			if (((d < ub) && (d > degree)), { ub = d; });
+			| deg |
+			if (((deg > lb) && (deg <= reduced_degree)), { lb = deg; });
+			if (((deg < ub) && (deg >= reduced_degree)), { ub = deg; });
 		});
-		result = degree.linlin(lb,ub,degree_to_midi[lb] + ((octave+extra_octaves+1)*steps_per_octave),degree_to_midi[ub] + ((octave+extra_octaves+1)*steps_per_octave));
-		if ((result < parser.asMidi(referencenote)[0]), { ^(result + steps_per_octave); }, { ^result; });
+		^((reduced_degree.linlin(lb, ub, degree_to_midi[lb], degree_to_midi[ub])) + ((octave+extra_octaves+1)*steps_per_octave));
 	}
 }

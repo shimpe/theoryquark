@@ -47,8 +47,7 @@ TestTheoryScale : UnitTest {
 		this.assert(u.midiToDegree(68) == 2, "Note outside scale 3");
 		this.assert(u.midiToDegree(75) == 6, "Note at extreme of scale");
 		this.assert(u.midiToDegree(75.5) == 6.5, "Note outside extreme of scale");
-		u.midiToDegree(0.5);
-		this.assert(u.midiToDegree(0.5) == 0.5, "Note outside extreme of scale 2");
+		this.assert(u.midiToDegree(0.5) == 4.75, "Note outside extreme of scale 2"); // 0.5 midi is c quarter sharp => in e major = 4.75
 	}
 
 	test_degreeToMidi {
@@ -56,10 +55,9 @@ TestTheoryScale : UnitTest {
 		var v = TheoryScale.new("b4", "major", "b4 c#5 d#5 e5 f#5 g#5 a#5");
 
 		this.assert(u.degreeToMidi(5, 4) == 69, "Degree in scale");
-		this.assert(u.degreeToMidi((5+6), 4) == (69+12), "Degree > max degree in scale");
+		this.assert(u.degreeToMidi((5+7), 4) == (69+12), "Degree > max degree in scale");
 		this.assert(u.degreeToMidi(5.5, 4) == 70, "Degree outside scale");
-		this.assert(u.degreeToMidi(11.5, 4) == (69+12+1), "Degree outside scale outside octave");
-
+		this.assert(u.degreeToMidi(5+7+0.5, 4) == (69+12+1), "Degree outside scale outside octave");
 		this.assert(v.degreeToMidi(0, 4) == 71, "Degree in scale");
 		this.assert(v.degreeToMidi(1, 4) == 73, "Degree in scale, crossing octave boundary");
 	}
