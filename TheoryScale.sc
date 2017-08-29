@@ -87,11 +87,17 @@ TheoryScale {
 		var extra_octaves = degree.div(no_of_degrees);
 		var ub = 10000;
 		var lb = 0;
-		degree_to_midi.keys.do({
-			| deg |
-			if (((deg > lb) && (deg <= reduced_degree)), { lb = deg; });
-			if (((deg < ub) && (deg >= reduced_degree)), { ub = deg; });
+		if ((reduced_degree < max_degree), {
+			degree_to_midi.keys.do({
+				| deg |
+				if (((deg > lb) && (deg <= reduced_degree)), { lb = deg; });
+				if (((deg < ub) && (deg >= reduced_degree)), { ub = deg; });
+			});
+			^((reduced_degree.linlin(lb, ub, degree_to_midi[lb], degree_to_midi[ub])) + ((octave+extra_octaves+1)*steps_per_octave));
+		}, {
+			var next_degree = min_degree + no_of_degrees;
+			var next_midi = degree_to_midi[max_degree]+1;
+			^reduced_degree.linlin(max_degree, next_degree, degree_to_midi[max_degree], next_midi);
 		});
-		^((reduced_degree.linlin(lb, ub, degree_to_midi[lb], degree_to_midi[ub])) + ((octave+extra_octaves+1)*steps_per_octave));
 	}
 }

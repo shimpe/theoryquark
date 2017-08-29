@@ -61,5 +61,22 @@ TestTheoryScale : UnitTest {
 		this.assert(v.degreeToMidi(0, 4) == 71, "Degree in scale");
 		this.assert(v.degreeToMidi(1, 4) == 73, "Degree in scale, crossing octave boundary");
 	}
+
+	test_symmetry1 {
+		var u = TheoryScale.new("c4", "phrygian", "c4 db4 eb4 f4 g4 ab4 bb4");
+		100.do({
+			| i |
+			this.assert((u.degreeToMidi(u.midiToDegree(i /11), -1) - (i / 11)) < 1e-5, i/11);
+		});
+	}
+
+	test_symmetry2 {
+		var u = TheoryScale.new("c4", "phrygian", "c4 db4 eb4 f4 g4 ab4 bb4");
+		100.do({
+			| i |
+			this.assert((u.midiToDegree(u.degreeToMidi(i/11, 0)) - (i/11)) < 1e-5, i/11);
+		});
+	}
 }
+
 
