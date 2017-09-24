@@ -60,6 +60,12 @@ TheoryScale {
 		var reduced_midi = midi.mod(steps_per_octave);
 		var min_midi = midi_to_degree.keys().minItem;
 		var max_midi = midi_to_degree.keys().maxItem;
+		if (midi.isKindOf(String), {
+			^midi.split.collect({ |note| ^this.midiToDegree(note) });
+		});
+		if (midi.isKindOf(Collection), {
+			^midi.collect({ |note| this.midiToDegree(note) });
+		});
 		while ({reduced_midi < min_midi}, { reduced_midi = reduced_midi + steps_per_octave; });
 		if ((reduced_midi < max_midi), {
 			var ub = 10000;
@@ -87,6 +93,12 @@ TheoryScale {
 		var extra_octaves = degree.div(no_of_degrees);
 		var ub = 10000;
 		var lb = 0;
+		if (degree.isKindOf(String), {
+			^degree.split.collect({ |note| ^this.degreeToMidi(note, octave) });
+		});
+		if (degree.isKindOf(Collection), {
+			^degree.collect({ |note| this.degreeToMidi(note, octave) });
+		});
 		if ((reduced_degree < max_degree), {
 			degree_to_midi.keys.do({
 				| deg |

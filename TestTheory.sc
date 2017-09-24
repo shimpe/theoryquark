@@ -82,7 +82,9 @@ TestTheoryScale : UnitTest {
 		var u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
 		var v = TheoryScale.new("c4", "natural minor", "c4 d4 eb4 f4 g4 ab4 bb4");
 		var tnp = TheoryNoteParser.new;
-		this.assert(u.midiToDegree(tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4")) == [69, 71, 73, 69, 69, 71, 73, 69]);
+		this.assert(tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4") == #[60, 62, 64, 60, 60, 62, 64, 60]);
+		this.assert(u.midiToDegree(tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4")) == #[0, 1, 2, 0, 0, 1, 2, 0], "midiToDegree");
+		this.assert(v.degreeToMidi(u.midiToDegree(tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4")), 4) == #[60, 62, 63, 60, 60, 62, 63, 60], "modal transposition");
 	}
 }
 
