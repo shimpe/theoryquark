@@ -1,4 +1,5 @@
 TheoryNoteParser {
+	var <chromatic_scale;
 	var <lookup_table;
 
 	*new {
@@ -7,7 +8,6 @@ TheoryNoteParser {
 
 	init {
 		var notenum = 0;
-		var chromatic_scale;
 		var corner_case_octave_lower;
 		var corner_case_octave_higher;
 		lookup_table = Dictionary.new;

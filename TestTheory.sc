@@ -57,7 +57,7 @@ TestTheoryScale : UnitTest {
 		this.assert(u.degreeToMidi(5, 4) == 69, "Degree in scale");
 		this.assert(u.degreeToMidi((5+7), 4) == (69+12), "Degree > max degree in scale");
 		this.assert(u.degreeToMidi(5.5, 4) == 70, "Degree outside scale");
-		this.assert(u.degreeToMidi(5+7+0.5, 4) == (69+12+1), "Degree outside scale outside octave");
+		this.assert(u.degreeToMidi(5+7+0.5, 4) == (69+12+ 1), "Degree outside scale outside octave");
 		this.assert(v.degreeToMidi(0, 4) == 71, "Degree in scale");
 		this.assert(v.degreeToMidi(1, 4) == 73, "Degree in scale, crossing octave boundary");
 	}
@@ -76,5 +76,45 @@ TestTheoryScale : UnitTest {
 			| i |
 			this.assert((u.midiToDegree(u.degreeToMidi(i/11, 0)) - (i/11)) < 1e-5, i/11);
 		});
+	}
+
+	test_modaltransposition {
+		var u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+		var v = TheoryScale.new("c4", "natural minor", "c4 d4 eb4 f4 g4 ab4 bb4");
+		var tnp = TheoryNoteParser.new;
+		this.assert(u.midiToDegree(tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4")) == [69, 71, 73, 69, 69, 71, 73, 69]);
+	}
+}
+
+TestTheoryInterval : UnitTest {
+
+	test_equality {
+		var t = TheoryInterval.new("a4", "d5");
+		var u = TheoryInterval.new("a4", "d5");
+		this.assert(t == u, "equality of two intervals");
+	}
+
+	test_notenamedistance {
+		var t = TheoryInterval.new("a4", "d5");
+		var u = TheoryInterval.new("d5", "a4");
+		this.assert(t.noteNameDistance == 3, "note name distance, crossing octave");
+		this.assert(u.noteNameDistance == 4, "note name distance, normal");
+	}
+
+	test_chromaticdistance {
+		var t = TheoryInterval.new("a4", "d5");
+		var u = TheoryInterval.new("d5", "a4");
+		this.assert(t.chromaticDistance == 5, "chromatic distance rising interval");
+		this.assert(u.chromaticDistance == -5, "chromatic distance descending interval");
+	}
+
+	test_transposeto {
+		var t = TheoryInterval.new("a4", "d5");
+		var u = TheoryInterval.new("g4", "b4");
+		var v = TheoryInterval.new("d5", "g4");
+		this.assert(t.transposeTo("c#4") == TheoryInterval.new("c#4", "f#4"), "transpose up, from cross octave to intra octave");
+		this.assert(u.transposeTo("b4") == TheoryInterval.new("b4", "d#5"), "transpose up, from intra octave to cross octave");
+		this.assert(u.transposeTo("fx4") == TheoryInterval.new("fx4", "ax4"), "transpose to same note");
+		this.assert(v.transposeTo("bb4") == TheoryInterval.new("bb4", "eb4"), "descending interval with flats");
 	}
 }
