@@ -57,15 +57,18 @@ TheoryScale {
 
 	midiToDegree {
 		| midi |
-		var reduced_midi = midi.mod(steps_per_octave);
-		var min_midi = midi_to_degree.keys().minItem;
-		var max_midi = midi_to_degree.keys().maxItem;
+		var reduced_midi;
+		var min_midi;
+		var max_midi;
 		if (midi.isKindOf(String), {
-			^midi.split.collect({ |note| ^this.midiToDegree(note) });
+			^midi.split.collect({ |note| this.midiToDegree(note) });
 		});
 		if (midi.isKindOf(Collection), {
 			^midi.collect({ |note| this.midiToDegree(note) });
 		});
+		reduced_midi = midi.mod(steps_per_octave);
+		min_midi = midi_to_degree.keys().minItem;
+		max_midi = midi_to_degree.keys().maxItem;
 		while ({reduced_midi < min_midi}, { reduced_midi = reduced_midi + steps_per_octave; });
 		if ((reduced_midi < max_midi), {
 			var ub = 10000;
@@ -83,6 +86,21 @@ TheoryScale {
 		});
 	}
 
+	midiToDegreeNotNorm {
+		| midi, refnote |
+		var octaves;
+		var degrees;
+		if (midi.isKindOf(String), {
+			^midi.split.collect({ | note | this.midiToDegreeNotNorm(note) });
+		});
+		if (midi.isKindOf(Collection), {
+			^midi.collect({ | note | this.midiToDegreeNotNorm(note); });
+		});
+		octaves = midi.div(steps_per_octave);
+		degrees = this.midiToDegree(midi);
+		^((steps_per_octave*octaves) + degrees)
+	}
+
 	degreeToMidi {
 		| degree, octave |
 		var degree_to_midi = midi_to_degree.invert;
@@ -94,7 +112,7 @@ TheoryScale {
 		var ub = 10000;
 		var lb = 0;
 		if (degree.isKindOf(String), {
-			^degree.split.collect({ |note| ^this.degreeToMidi(note, octave) });
+			^degree.split.collect({ |note| this.degreeToMidi(note, octave) });
 		});
 		if (degree.isKindOf(Collection), {
 			^degree.collect({ |note| this.degreeToMidi(note, octave) });
@@ -112,4 +130,24 @@ TheoryScale {
 			^reduced_degree.linlin(max_degree, next_degree, degree_to_midi[max_degree], next_midi);
 		});
 	}
+
+	degreeNotNormToMidi {
+		| degree |
+		var octaves;
+		var degrees;
+		var normres;
+		if (degree.isKindOf(String), {
+			^degree.split.collect({ |note| this.degreeNotNormToMidi(degree); });
+		});
+		if (degree.isKindOf(Collection), {
+			^degree.collect({ |note| this.degreeNotNormToMidi(degree); });
+		});
+		octaves = degree.div(steps_per_octave);
+		degrees = (degree - (steps_per_octave*octaves));
+		normres = this.degreeToMidi(degrees, -1);
+		^(normres + (steps_per_octave*octaves));
+	}
 }
+
+
+

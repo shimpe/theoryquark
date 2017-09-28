@@ -62,6 +62,18 @@ TestTheoryScale : UnitTest {
 		this.assert(v.degreeToMidi(1, 4) == 73, "Degree in scale, crossing octave boundary");
 	}
 
+	test_midiToDegreeNotNorm {
+		var u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+		this.assert(u.midiToDegree(69) == 5, "degree to Midi normalized");
+		this.assert(u.midiToDegreeNotNorm(69) == 65, "degree to Midi not normalized");
+	}
+
+	test_degreeNotNormToMidi {
+		var u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+		this.assert(u.degreeNotNormToMidi(65) == 69, "degree not normalized to midi 1");
+		this.assert(u.degreeNotNormToMidi(53) == 57, "degree not normalized to midi 2");
+	}
+
 	test_symmetry1 {
 		var u = TheoryScale.new("c4", "phrygian", "c4 db4 eb4 f4 g4 ab4 bb4");
 		100.do({
