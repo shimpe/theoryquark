@@ -72,6 +72,7 @@ TestTheoryScale : UnitTest {
 		var u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
 		this.assert(u.degreeNotNormToMidi(65) == 69, "degree not normalized to midi 1");
 		this.assert(u.degreeNotNormToMidi(53) == 57, "degree not normalized to midi 2");
+		this.assert(u.degreeNotNormToMidi([ 60, 53.5]) == [60, 58], "degree not normalized list to midi");
 	}
 
 	test_symmetry1 {

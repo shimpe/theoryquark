@@ -137,10 +137,10 @@ TheoryScale {
 		var degrees;
 		var normres;
 		if (degree.isKindOf(String), {
-			^degree.split.collect({ |note| this.degreeNotNormToMidi(degree); });
+			^degree.split.collect({ |note| this.degreeNotNormToMidi(note); });
 		});
 		if (degree.isKindOf(Collection), {
-			^degree.collect({ |note| this.degreeNotNormToMidi(degree); });
+			^degree.collect({ |note| this.degreeNotNormToMidi(note); });
 		});
 		octaves = degree.div(steps_per_octave);
 		degrees = (degree - (steps_per_octave*octaves));
