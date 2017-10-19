@@ -64,15 +64,41 @@ TestTheoryScale : UnitTest {
 
 	test_midiToDegreeNotNorm {
 		var u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+		var v = TheoryScale.new("c4", "minor", "c4 d4 eb4 f4 g4 ab4 bb4");
+		var n = TheoryNoteParser.new;
 		this.assert(u.midiToDegree(69) == 5, "degree to Midi normalized");
 		this.assert(u.midiToDegreeNotNorm(69) == 65, "degree to Midi not normalized");
+		this.assert(v.midiToDegreeNotNorm(n.asMidi("bb4")[0]) == 66, "midi to degree inside scale");
+		this.assert(v.midiToDegreeNotNorm(n.asMidi("b4")[0].postln) == 66.5, "midi to degree outside scale");
+
 	}
 
 	test_degreeNotNormToMidi {
 		var u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+		var v = TheoryScale.new("c4", "minor", "c4 d4 eb4 f4 g4 ab4 bb4");
+		var n = TheoryNoteParser.new;
 		this.assert(u.degreeNotNormToMidi(65) == 69, "degree not normalized to midi 1");
 		this.assert(u.degreeNotNormToMidi(53) == 57, "degree not normalized to midi 2");
 		this.assert(u.degreeNotNormToMidi([ 60, 53.5]) == [60, 58], "degree not normalized list to midi");
+		this.assert(v.degreeNotNormToMidi(65.5).postln == n.asMidi("a4")[0].postln, "degree not normalized outside scale");
+		["a3", "a#3", "b3", "c4", "c#4", "d4", "d#4", "e4", "f4", "f#4", "g4", "g#4", "a4"].do({
+			| note |
+			var midi;
+			var deg;
+			var m2d;
+			var d2m;
+			//"midi:".postln;
+			midi = n.asMidi(note)[0].postln;
+			//"deg-norm:".postln;
+			//deg = v.midiToDegree(midi).postln;
+			//"d2m-norm:".postln;
+			//v.degreeToMidi(deg, 3).postln;
+			//"m2d-notnorm:".postln;
+			m2d = v.midiToDegreeNotNorm(midi).postln;
+			//"d2m-notnorm:".postln;
+			d2m = v.degreeNotNormToMidi(m2d).postln;
+			this.assert(midi == d2m, "midi to degree not norm inverts degree not norm to midi "++note);
+		});
 	}
 
 	test_symmetry1 {
@@ -133,3 +159,4 @@ TestTheoryInterval : UnitTest {
 		this.assert(v.transposeTo("bb4") == TheoryInterval.new("bb4", "eb4"), "descending interval with flats");
 	}
 }
+

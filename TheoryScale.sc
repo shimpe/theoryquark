@@ -97,7 +97,8 @@ TheoryScale {
 			^midi.collect({ | note | this.midiToDegreeNotNorm(note); });
 		});
 		octaves = midi.div(steps_per_octave);
-		degrees = this.midiToDegree(midi);
+		//"midi2deg:".postln;
+		degrees = this.midiToDegree(midi);//.postln;
 		^((steps_per_octave*octaves) + degrees)
 	}
 
@@ -126,8 +127,12 @@ TheoryScale {
 			^((reduced_degree.linlin(lb, ub, degree_to_midi[lb], degree_to_midi[ub])) + ((octave+extra_octaves+1)*steps_per_octave));
 		}, {
 			var next_degree = min_degree + no_of_degrees;
-			var next_midi = degree_to_midi[max_degree]+1;
-			^reduced_degree.linlin(max_degree, next_degree, degree_to_midi[max_degree], next_midi);
+			var next_midi = degree_to_midi[max_degree] + (degree_to_midi[min_degree] + steps_per_octave - degree_to_midi[max_degree]);
+			//("max degree: "++max_degree).postln;
+			//("next degree: "++next_degree).postln;
+			//("degree_to_midi[max_degree]: "++degree_to_midi[max_degree]).postln;
+			//("next midi: "++next_midi).postln;
+			^reduced_degree.linlin(max_degree, next_degree, degree_to_midi[max_degree], next_midi) + ((octave+extra_octaves+1)*steps_per_octave);
 		});
 	}
 
@@ -142,9 +147,12 @@ TheoryScale {
 		if (degree.isKindOf(Collection), {
 			^degree.collect({ |note| this.degreeNotNormToMidi(note); });
 		});
-		octaves = degree.div(steps_per_octave);
-		degrees = (degree - (steps_per_octave*octaves));
-		normres = this.degreeToMidi(degrees, -1);
+		//"octaves:".postln;
+		octaves = degree.div(steps_per_octave);//.postln;
+		//"degrees:".postln;
+		degrees = (degree - (steps_per_octave*octaves));//.postln;
+		//"normres:".postln;
+		normres = this.degreeToMidi(degrees, -1);//.postln;
 		^(normres + (steps_per_octave*octaves));
 	}
 }
