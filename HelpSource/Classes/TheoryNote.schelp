@@ -1,0 +1,35 @@
+TITLE:: TheoryNote
+summary:: models a single note
+categories:: Undocumented classes
+related:: Classes/TheoryInterval, Classes/TheoryNoteParser, Classes/TheoryScale
+
+DESCRIPTION::
+models a single note, initialized from a string
+
+
+CLASSMETHODS::
+
+METHOD:: new
+constructs a new TheoryNote from a string
+
+ARGUMENT:: n
+the string describing the note. Use notenames
+a,b,c,d,e,f,g and "#" for sharp, "x" for double sharp,
+"b" for flat and "bb" for double flat.
+
+returns:: a new TheoryNote
+
+
+INSTANCEMETHODS::
+
+METHOD:: asMidi
+converts the TheoryNote in a midi note number
+
+returns:: midi note number
+
+EXAMPLES::
+
+code::
+b = TheoryNote.new("a4");
+b.asMidi == 69;
+::

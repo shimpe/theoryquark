@@ -1,0 +1,45 @@
+TITLE:: TheoryNoteParser
+summary:: class to convert midi note names to midi note numbers
+categories:: Undocumented classes
+related:: Classes/TheoryNote, Classes/TheoryInterval, Classes/TheoryScale
+
+DESCRIPTION::
+TheoryNoteParser can convert midi note names (specified in string form)
+to midi note numbers.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+create a new instance of TheoryNoteParser
+
+returns:: TheoryNoteParser
+
+
+INSTANCEMETHODS::
+
+METHOD:: asMidi
+Converts note names to midi note numbers.
+
+ARGUMENT:: notenames
+a string containing whitespace separated note names, or a collection of strings containing note names
+using notenames a,b,c,d,e,f,g and "#" for a sharp, "x" for a double sharp, "b" for a flat and "bb" for a double flat
+
+ARGUMENT:: separator
+allows to specify a custom separator (see examples)
+
+returns:: a list of midi note numbers
+
+EXAMPLES::
+
+code::
+a = TheoryNoteParser.new;
+// parse from string
+a.asMidi("a4 c#5 e5 a5 bb5 e6 ax6") == [69, 73, 76, 81, 82, 88, 95];
+// parse from string with custom separator
+a.asMidi("a4 | c#5| e5|a5|bb5| e6|a6   | ", $|) == [69, 73, 76, 81, 82, 88, 93];
+// parse from collection of strings
+a.asMidi(["a4", "c#5", "e5", "a5", "bb5", "e6","a6"]) == [69, 73, 76, 81, 82, 88, 93];
+// midi note numbers cannot go higher than 127
+a.asMidi("c4 bx3 c#4 db4 dbb3 cb4 b3 f12") == [60, 61, 61, 61, 48, 59, 59, nil];
+::

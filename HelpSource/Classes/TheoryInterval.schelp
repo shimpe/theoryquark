@@ -1,0 +1,105 @@
+TITLE:: TheoryInterval
+summary:: models an interval between two TheoryNotes
+categories:: Undocumented classes
+related:: Classes/TheoryNote, Classes/TheoryNoteParser, Classes/TheoryScale
+
+DESCRIPTION::
+A TheoryInterval models an interval (a 2-note chord if you like) between two TheoryNotes.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+create a new TheoryInterval
+
+ARGUMENT:: note1
+a string describing the first note in the interval
+
+ARGUMENT:: note2
+a string describing the second note in the interval
+
+returns:: a TheoryInterval
+
+
+INSTANCEMETHODS::
+
+METHOD:: ==
+checks if two TheoryIntervals are equal
+
+ARGUMENT:: other
+interval to compare this interval to
+
+returns:: boolean, True if the two intervals are equal
+
+METHOD:: transposeTo
+returns a new interval that results from transposing the first note in this
+interval to newnote
+
+ARGUMENT:: newnote
+the new note to which the first note in the interval needs to be transposed
+
+returns:: a TheoryInterval
+
+METHOD:: chromaticDistance
+returns the distance in half tones between the first note and the second note in the interval
+for descending intervals, the method returns a negative number
+
+returns:: chromatic distance of interval
+
+METHOD:: note1
+returns the first note in the interval
+
+returns:: second note
+
+METHOD:: note2
+returns the second note in the interval
+
+returns:: second note
+
+METHOD:: init
+initialize a new TheoryInterval from two notes
+
+ARGUMENT:: n1
+first note in the interval
+
+ARGUMENT:: n2
+second note in the interval
+
+returns:: new TheoryInterval
+
+METHOD:: noteNameDistance
+returns the distance between the note names. How this differs from the chromaticDistance
+is best made clear using an example: g-c has a chromaticDistance of 5 (5 half tones between g and c),
+whereas it has a noteNameDistance of only 3 (g->a->b->c).
+
+returns:: noteNameDistance
+
+
+EXAMPLES::
+
+code::
+(
+t = TheoryInterval.new("a4", "d5");
+u = TheoryInterval.new("d5", "a4");
+t.noteNameDistance == 3;
+u.noteNameDistance == 4;
+)
+
+(
+t = TheoryInterval.new("a4", "d5");
+u = TheoryInterval.new("d5", "a4");
+t.chromaticDistance == 5;
+u.chromaticDistance == -5;
+)
+
+(
+t = TheoryInterval.new("a4", "d5");
+u = TheoryInterval.new("g4", "b4");
+v = TheoryInterval.new("d5", "g4");
+t.transposeTo("c#4") == TheoryInterval.new("c#4", "f#4");
+u.transposeTo("b4") == TheoryInterval.new("b4", "d#5");
+u.transposeTo("fx4") == TheoryInterval.new("fx4", "ax4");
+v.transposeTo("bb4") == TheoryInterval.new("bb4", "eb4");
+)
+
+::

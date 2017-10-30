@@ -1,0 +1,8 @@
+(
+  name: "TheoryQuark",
+  summary: "Quark modeling some music theoretical concepts.",
+  version: "0.0.1",
+  schelp: "TheoryScale.schelp",
+  license: "GPL",
+  copyright: "Stefaan Himpe, oct 2017"
+)

@@ -87,7 +87,7 @@ TheoryScale {
 	}
 
 	midiToDegreeNotNorm {
-		| midi, refnote |
+		| midi |
 		var octaves;
 		var degrees;
 		if (midi.isKindOf(String), {

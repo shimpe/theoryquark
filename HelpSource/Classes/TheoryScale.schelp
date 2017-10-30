@@ -1,0 +1,194 @@
+TITLE:: TheoryScale
+summary:: models a scale
+categories:: Undocumented classes
+related:: Classes/TheoryInterval, Classes/TheoryNote, Classes/TheoryNoteParser
+
+DESCRIPTION::
+Models a scale as a collection of pitches. Scales allow us to reinterpret
+notes as scale degrees.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+creates a new scale from a base note and a collection of notes.
+
+ARGUMENT:: basenote
+a string describing a reference note, e.g. if you define
+an "e major" scale made of pitches "e4 f#4 g#4 a b c#4 d#4",
+"e4" would be the most natural reference note.
+
+ARGUMENT:: type
+a string describing a scale type, e.g. if you define an
+"e major" scale, "major" would be the type
+
+ARGUMENT:: collection
+a collection of notes that make up one octave of the scale
+
+
+returns:: a TheoryScale
+
+INSTANCEMETHODS::
+
+METHOD:: midi_to_degree
+converts a collection of midi note numbers to degrees as interpreted in this scale
+
+returns:: collection of degrees in this scale
+
+METHOD:: asMidi
+converts a collection of notes into midi note numbers
+
+returns:: collection of midi numbers
+
+METHOD:: asDegree
+converts a collection of notes into a collection of scale degrees
+
+returns:: collection of scale degrees
+
+METHOD:: midiToDegree
+converts midi note numbers to degrees
+
+ARGUMENT:: midi
+midi note numbers
+
+returns:: collection of degrees
+
+METHOD:: noteToDegree
+converts note to degree
+
+ARGUMENT:: note
+a string denoting a note, e.g. "eb4"
+
+returns:: (describe returnvalue here)
+
+METHOD:: referencenote
+returns the reference note defined when creating the scale
+
+returns:: reference note
+
+METHOD:: midiToDegreeNotNorm
+converts midi note numbers to degrees in a way that doesn't lose
+octave information
+
+ARGUMENT:: midi
+midi note number
+
+returns:: degree-ish number (includes octave information)
+
+METHOD:: degreeToMidi
+converts scale degree to midi note number in a given octave.
+Pure scale degrees have no octave information.
+
+ARGUMENT:: degree
+scale degree
+
+ARGUMENT:: octave
+octave
+
+returns:: midi note number
+
+METHOD:: degreeNotNormToMidi
+converts a non-normalized degree to midi. Non-normalized degrees
+are degrees that still have octave information.
+
+ARGUMENT:: degree
+degree
+
+returns:: midi notenumber
+
+
+EXAMPLES::
+
+code::
+(
+ a = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+ b = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4".split());
+ c = TheoryScale.new("c4", "major", (60..71));
+ // Parse from string
+ a.asMidi == [ 60, 62, 64, 65, 67, 69, 71 ];
+ // Parse from collection
+ b.asMidi == [ 60, 62, 64, 65, 67, 69, 71 ];
+ // Parse from midinumbers
+ c.asMidi == [ 60, 61, 62, 63,64,65,66,67,68,69,70,71];
+)
+
+(
+ t = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+ // Note in scale
+ t.noteToDegree("a4") == 5;
+ // Note outside scale and different octave
+ t.noteToDegree("a#3") == 5.5;
+ // Note outside scale and different octave 2
+ t.noteToDegree("eb2") == 1.5;
+
+ u = TheoryScale.new("c4", "minor", "c4 d4 eb4 f4 g4 ab4 bb4");
+ // Note outside scale 2
+ u.noteToDegree("a4") == 5.5;
+ // Note in scale, different octave (kinda ;) )
+ u.noteToDegree("a#3") == 6;
+ // Note in scale, different octave 2
+ u.noteToDegree("eb2") == 2;
+)
+
+(
+ u = TheoryScale.new("e4", "major", "e4 f#4 g#4 a4 b4 c#5 d#5");
+ // Note in scale
+ u.midiToDegree(69) == 3;
+ // Note outside scale
+ u.midiToDegree(70) == 3.5;
+ // Note outside scale 2
+ u.midiToDegree(68.5) == 2.5;
+ // Note outside scale 3
+ u.midiToDegree(68) == 2;
+ // Note at extreme of scale
+ u.midiToDegree(75) == 6;
+ // Note outside extreme of scale
+ u.midiToDegree(75.5) == 6.5;
+ // Note outside extreme of scale 2"
+ u.midiToDegree(0.5) == 4.75; // 0.5 midi is c quarter sharp => in e major = 4.75
+)
+
+(
+ u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+ v = TheoryScale.new("b4", "major", "b4 c#5 d#5 e5 f#5 g#5 a#5");
+ // Degree in scale
+ u.degreeToMidi(5, 4) == 69;
+ // Degree > max degree in scale
+ u.degreeToMidi((5+7), 4) == (69+12);
+ // Degree outside scale
+ u.degreeToMidi(5.5, 4) == 70;
+ // Degree outside scale outside octave
+ u.degreeToMidi(5+7+0.5, 4) == (69+12+ 1);
+ // Degree in scale
+ v.degreeToMidi(0, 4) == 71;
+ // Degree in scale, crossing octave boundary
+ v.degreeToMidi(1, 4) == 73;
+)
+(
+ u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+ v = TheoryScale.new("c4", "minor", "c4 d4 eb4 f4 g4 ab4 bb4");
+ n = TheoryNoteParser.new;
+ // degree to Midi normalized
+ u.midiToDegree(69) == 5;
+// degree too Midi not normalized (includes octave information)
+ u.midiToDegreeNotNorm(69) == 65;
+ // midi to degree inside scale
+ v.midiToDegreeNotNorm(n.asMidi("bb4")[0]) == 66;
+ // Midi to degree outside scale
+ v.midiToDegreeNotNorm(n.asMidi("b4")[0]) == 66.5;
+
+)
+
+(
+ u = TheoryScale.new("c4", "major", "c4 d4 e4 f4 g4 a4 b4");
+ v = TheoryScale.new("c4", "natural minor", "c4 d4 eb4 f4 g4 ab4 bb4");
+ tnp = TheoryNoteParser.new;
+ tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4") == #[60, 62, 64, 60, 60, 62, 64, 60];
+
+ // "modal transposition"
+ u.midiToDegree(tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4")) == #[0, 1, 2, 0, 0, 1, 2, 0], "midiToDegree");
+ v.degreeToMidi(u.midiToDegree(tnp.asMidi("c4 d4 e4 c4 c4 d4 e4 c4")), 4) == #[60, 62, 63, 60, 60, 62, 63, 60];
+)
+
+
+::
