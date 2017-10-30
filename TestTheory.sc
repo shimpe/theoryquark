@@ -69,7 +69,7 @@ TestTheoryScale : UnitTest {
 		this.assert(u.midiToDegree(69) == 5, "degree to Midi normalized");
 		this.assert(u.midiToDegreeNotNorm(69) == 65, "degree to Midi not normalized");
 		this.assert(v.midiToDegreeNotNorm(n.asMidi("bb4")[0]) == 66, "midi to degree inside scale");
-		this.assert(v.midiToDegreeNotNorm(n.asMidi("b4")[0].postln) == 66.5, "midi to degree outside scale");
+		this.assert(v.midiToDegreeNotNorm(n.asMidi("b4")[0]) == 66.5, "midi to degree outside scale");
 
 	}
 
@@ -80,23 +80,15 @@ TestTheoryScale : UnitTest {
 		this.assert(u.degreeNotNormToMidi(65) == 69, "degree not normalized to midi 1");
 		this.assert(u.degreeNotNormToMidi(53) == 57, "degree not normalized to midi 2");
 		this.assert(u.degreeNotNormToMidi([ 60, 53.5]) == [60, 58], "degree not normalized list to midi");
-		this.assert(v.degreeNotNormToMidi(65.5).postln == n.asMidi("a4")[0].postln, "degree not normalized outside scale");
+		this.assert(v.degreeNotNormToMidi(65.5) == n.asMidi("a4")[0], "degree not normalized outside scale");
 		["a3", "a#3", "b3", "c4", "c#4", "d4", "d#4", "e4", "f4", "f#4", "g4", "g#4", "a4"].do({
 			| note |
 			var midi;
-			var deg;
 			var m2d;
 			var d2m;
-			//"midi:".postln;
-			midi = n.asMidi(note)[0].postln;
-			//"deg-norm:".postln;
-			//deg = v.midiToDegree(midi).postln;
-			//"d2m-norm:".postln;
-			//v.degreeToMidi(deg, 3).postln;
-			//"m2d-notnorm:".postln;
-			m2d = v.midiToDegreeNotNorm(midi).postln;
-			//"d2m-notnorm:".postln;
-			d2m = v.degreeNotNormToMidi(m2d).postln;
+			midi = n.asMidi(note)[0];
+			m2d = v.midiToDegreeNotNorm(midi);
+			d2m = v.degreeNotNormToMidi(m2d);
 			this.assert(midi == d2m, "midi to degree not norm inverts degree not norm to midi "++note);
 		});
 	}
